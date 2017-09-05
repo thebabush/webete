@@ -1,3 +1,3 @@
 
 # Cosmetics
-SECTION_WIDTH = 20
+SECTION_WIDTH = 30

@@ -30,22 +30,29 @@ def action_auto(target):
         print(r.status_code)
 
 
-def action_python(target, fname):
-    PYTHON_EXTS = ['pyc', 'pyd', 'pyo']
-    PYTHON_VERSIONS = ['26', '27', '35', '36', '37']
+def action_python(target, fpath):
     # Should we support these?
     # foo.cpython-35.opt-1.pyc
     # foo.cpython-35.opt-2.pyc
     # pypy?
+    PYTHON_EXTS = ['pyc', 'pyd', 'pyo']
+    PYTHON_VERSIONS = ['26', '27', '35', '36', '37']
 
     start_section('PYTHON')
-    fname = util.strip_file_ext_from_list(fname, ['py'] + PYTHON_EXTS)
-    data = None
+
+    # Mangle file name
+    fpath = util.strip_file_ext_from_list(fpath, ['py'] + PYTHON_EXTS)
+    fdir, fname = os.path.split(fpath)
+
+    guess_prefix = target + fdir + '/' if fdir else target 
     for guess in itertools.chain(
-        ('{}.cpython-{}.{}'.format(fname, ver, ext) for ver, ext in itertools.product(PYTHON_VERSIONS, PYTHON_EXTS)),
-        ('__pycache__/{}.cpython-{}.{}'.format(fname, ver, ext) for ver, ext in itertools.product(PYTHON_VERSIONS, PYTHON_EXTS))
-            ):
-        guess_url = target + guess
+            ('{}.cpython-{}.{}'.format(fname, ver, ext) for ver, ext in itertools.product(PYTHON_VERSIONS, PYTHON_EXTS)),
+            ('__pycache__/{}.cpython-{}.{}'.format(fname, ver, ext) for ver, ext in itertools.product(PYTHON_VERSIONS, PYTHON_EXTS))
+        ):
+        # Build complete target url
+        guess_url = guess_prefix + guess
+
+        # Check if it exists
         log.info('Trying "{}"...'.format(guess))
         r = requests.get(guess_url)
         if r.status_code == 200:
@@ -56,7 +63,14 @@ def action_python(target, fname):
         return None
     
     version, ts, magic, code, is_pypy, source_size = xdis.load.load_module_from_file_object(io.BytesIO(data))
-    out_name = fname + '.py'
+    out_name = fpath + '.py'
+    out_dir  = os.path.dirname(out_name)
+
+    # Create output directory if not working on webroot
+    if out_dir:
+        os.makedirs(os.path.dirname(out_name), exist_ok=True)
+
+    # Decompile and save the file
     with open(out_name, 'w') as f:
         uncompyle6.semantics.pysource.deparse_code(version, code, out=f)
         print('Decompiled to "{}"'.format(out_name))
@@ -72,9 +86,9 @@ def dispatch_action(args):
 def main():
     parser = argparse.ArgumentParser(description='WEBETE - WEB Extensive Testing Environment')
 
-    parser.add_argument('target', help='Target URL')
+    parser.add_argument('target', help='Target URL (e.g.: http://127.0.0.1/)')
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose output')
-    action_group = parser.add_mutually_exclusive_group()
+    action_group = parser.add_mutually_exclusive_group(required=True)
     action_group.add_argument('-a', '--auto', action='store_true', help='Automatic simple recon')
     action_group.add_argument('-p', '--py', dest='python', help='Look for a specific pyc file')
     action_group.add_argument('--version', action='store_true', help='Print the version number')
