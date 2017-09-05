@@ -9,6 +9,7 @@ WEB Extensive Testing Environment.
 ```bash
 git clone git@github.com:kenoph/webete.git
 cd webete
+pip install .
 pip install -U --no-deps -r requirements.txt
 ```
 
