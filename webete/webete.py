@@ -90,7 +90,7 @@ def main():
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose output')
     action_group = parser.add_mutually_exclusive_group(required=True)
     action_group.add_argument('-a', '--auto', action='store_true', help='Automatic simple recon')
-    action_group.add_argument('-p', '--py', dest='python', help='Look for a specific pyc file')
+    action_group.add_argument('-p', '--python', dest='python', metavar='FILE', help='Look for a specific pyc file')
     action_group.add_argument('--version', action='store_true', help='Print the version number')
     args = parser.parse_args()
 
