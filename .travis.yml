@@ -11,4 +11,6 @@ install:
   - pip install .
   - pip install -U --no-deps -r requirements.txt
 # command to run tests
-script: nosetests
+script:
+  - nosetests
+  - pycodestyle --ignore=E501 webete tests

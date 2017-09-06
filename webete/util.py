@@ -5,4 +5,3 @@ def strip_file_ext_from_list(fname, exts):
         if fname.endswith(ext):
             return fname[:-len(ext)]
     return fname
-

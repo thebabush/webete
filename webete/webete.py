@@ -44,11 +44,12 @@ def action_python(target, fpath):
     fpath = util.strip_file_ext_from_list(fpath, ['py'] + PYTHON_EXTS)
     fdir, fname = os.path.split(fpath)
 
-    guess_prefix = target + fdir + '/' if fdir else target 
-    for guess in itertools.chain(
-            ('{}.cpython-{}.{}'.format(fname, ver, ext) for ver, ext in itertools.product(PYTHON_VERSIONS, PYTHON_EXTS)),
-            ('__pycache__/{}.cpython-{}.{}'.format(fname, ver, ext) for ver, ext in itertools.product(PYTHON_VERSIONS, PYTHON_EXTS))
-        ):
+    guess_prefix = target + fdir + '/' if fdir else target
+    guesses = itertools.chain(
+        ('{}.cpython-{}.{}'.format(fname, ver, ext) for ver, ext in itertools.product(PYTHON_VERSIONS, PYTHON_EXTS)),
+        ('__pycache__/{}.cpython-{}.{}'.format(fname, ver, ext) for ver, ext in itertools.product(PYTHON_VERSIONS, PYTHON_EXTS))
+    )
+    for guess in guesses:
         # Build complete target url
         guess_url = guess_prefix + guess
 
@@ -61,10 +62,10 @@ def action_python(target, fpath):
             break
     else:
         return None
-    
+
     version, ts, magic, code, is_pypy, source_size = xdis.load.load_module_from_file_object(io.BytesIO(data))
     out_name = fpath + '.py'
-    out_dir  = os.path.dirname(out_name)
+    out_dir = os.path.dirname(out_name)
 
     # Create output directory if not working on webroot
     if out_dir:
@@ -100,4 +101,3 @@ def main():
     log.debug('Args: {}'.format(args))
 
     dispatch_action(args)
-
