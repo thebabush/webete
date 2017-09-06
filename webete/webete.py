@@ -88,14 +88,15 @@ def main():
 
     parser.add_argument('target', help='Target URL (e.g.: http://127.0.0.1/)')
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose output')
+    parser.add_argument('--version', action='version', help='Print the version number', version='%(prog)s {version}'.format(version=__version__))
     action_group = parser.add_mutually_exclusive_group(required=True)
     action_group.add_argument('-a', '--auto', action='store_true', help='Automatic simple recon')
-    action_group.add_argument('-p', '--python', dest='python', metavar='FILE', help='Look for a specific pyc file')
-    action_group.add_argument('--version', action='store_true', help='Print the version number')
+    action_group.add_argument('-p', '--python', dest='python', metavar='FILE', help='Look for a specific pyc file under __pycache__ subdir')
     args = parser.parse_args()
 
     if args.verbose:
         logging.basicConfig(level=logging.NOTSET)
+
     log.debug('Args: {}'.format(args))
 
     dispatch_action(args)
