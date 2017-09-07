@@ -11,7 +11,9 @@ install:
   - pip install .
   - pip install -U --no-deps -r requirements.txt
   - pip install pycodestyle
+  - pip install pyflakes
 # command to run tests
 script:
   - nosetests
   - pycodestyle --ignore=E501 webete tests
+  - pyflakes webete/ tests/
