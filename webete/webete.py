@@ -25,14 +25,14 @@ def start_section(name):
 
 def action_auto(target):
     start_section('robots.txt')
-    r = requests.get(target + 'robots.txt') # does not need auth (it would be stupid)
+    r = requests.get(target + 'robots.txt')  # does not need auth (it would be stupid)
     if r.status_code == 200:
         print(r.text)
     else:
         print(r.status_code)
 
 
-def action_python(target, fpath , ausr, apwd):
+def action_python(target, fpath, ausr, apwd):
     # Should we support these?
     # foo.cpython-35.opt-1.pyc
     # foo.cpython-35.opt-2.pyc
@@ -40,18 +40,18 @@ def action_python(target, fpath , ausr, apwd):
     PYTHON_EXTS = ['pyc', 'pyd', 'pyo']
     PYTHON_VERSIONS = ['26', '27', '35', '36', '37']
 
-    ##Basic Auth Block. In the future this should go in another and specialized function
+    # Basic Auth Block. In the future this should go in another and specialized function
     http_auth = None
 
     log.debug('Http Basic auth: {}'.format((ausr, apwd)))
-    if (ausr != apwd) and ( ausr is None or apwd is None):
+    if(ausr != apwd) and (ausr is None or apwd is None):
         log.warning("Provided only Http Basic {}".format('Password' if ausr is None else 'Username'))
-        #maybe it is desiderable login with no pass or no username
+        # maybe it is required a login with no pass or no username
         if ausr is None:
             ausr = ''
         else:
             apwd = ''
-    elif not (ausr is None and ( ausr is apwd)):
+    elif not (ausr is None and (ausr is apwd)):
         http_auth = (ausr, apwd)
 
     start_section('PYTHON')
@@ -110,8 +110,8 @@ def main():
     action_group.add_argument('-a', '--auto', action='store_true', help='Automatic simple recon')
     action_group.add_argument('-p', '--python', dest='python', metavar='FILE', help='Look for a specific pyc file under __pycache__ subdir')
     auth_group = parser.add_argument_group(title="Authentication", description="Autentication and session handling options")
-    auth_group.add_argument('-P', '--bauth-pass', dest='auth_pwd',action = 'store', help ='Basic HTTP Auth password')
-    auth_group.add_argument('-U', '--bauth-user', dest='auth_usr',action = 'store', help ='Basic HTTP Auth Username')
+    auth_group.add_argument('-P', '--bauth-pass', dest='auth_pwd', action='store', help='Basic HTTP Auth Password')
+    auth_group.add_argument('-U', '--bauth-user', dest='auth_usr', action='store', help='Basic HTTP Auth Username')
 
     args = parser.parse_args()
 
