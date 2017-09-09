@@ -6,12 +6,15 @@ LIST_INDENT = 3
 AUTO_PROBE = [
     "robots.txt",
     ".htaccess",
+    ".htpasswd",
     "static/",
     "img/",
     "imgs/",
     "images/",
     "css/",
     "js/",
+    ".git/",
+    ".svn/",
     "sitemap.xml"
 ]
 PASSWD_TRAVERSAL = "../" * 10 + "etc/passwd"
