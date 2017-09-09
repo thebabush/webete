@@ -49,5 +49,6 @@ Pull requests are welcome. A few rules:
 - If you are working on an open issue, [reference it in the title](https://help.github.com/articles/closing-issues-using-keywords/). If you are fixing a bug that hasn't been reported yet, open an issue and reference it in the commit message.
 - Generally speaking, the codebase follows PEP8 with an exception: lines longer than 80 chars are OK-ish. Shorter is better than longer. You should definitely stay below 120. Longer lines should be the exception and should be used only for long string constants or when there's no sane way to avoid a `\`.
 - TODOs belong to GH issues most of the times, so that they can be discussed.
+- Imports should be divided in 3 groups: python standard library, external libs and interal libs. Avoid polluting the namespace with `from package import Stuff`, especially when you are going to use it few times or when it might get confused with project-defined vars/code.
 
 Most of these are somewhat flexible. Use common sense. 
