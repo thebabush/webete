@@ -12,6 +12,7 @@ import uncompyle6.semantics.pysource
 
 from .__init__ import __version__
 from . import printer
+from . import settings
 from . import util
 
 log = logging.getLogger()
@@ -26,23 +27,19 @@ def action_auto(target):
 
 
 def action_python(target, fpath):
-    # Should we support these?
-    # foo.cpython-35.opt-1.pyc
-    # foo.cpython-35.opt-2.pyc
-    # pypy?
-    PYTHON_EXTS = ['pyc', 'pyd', 'pyo']
-    PYTHON_VERSIONS = ['26', '27', '35', '36', '37']
-
     printer.print_header('PYTHON')
 
     # Mangle file name
-    fpath = util.strip_file_ext_from_list(fpath, ['py'] + PYTHON_EXTS)
+    exts = settings.PYTHON_EXTS
+    tags = settings.PYTHON_CACHE_TAGS
+    fpath = util.strip_file_ext_from_list(fpath, ['py'] + exts)
     fdir, fname = os.path.split(fpath)
 
     guess_prefix = target + fdir + '/' if fdir else target
     guesses = itertools.chain(
-        ('{}.cpython-{}.{}'.format(fname, ver, ext) for ver, ext in itertools.product(PYTHON_VERSIONS, PYTHON_EXTS)),
-        ('__pycache__/{}.cpython-{}.{}'.format(fname, ver, ext) for ver, ext in itertools.product(PYTHON_VERSIONS, PYTHON_EXTS))
+        ('{}.{}'.format(fname, ext) for ext in exts),
+        ('{}.{}.{}'.format(fname, tag, ext) for tag, ext in itertools.product(tags, exts)),
+        ('__pycache__/{}.{}.{}'.format(fname, tag, ext) for tag, ext in itertools.product(tags, exts))
     )
     for guess in guesses:
         # Build complete target url
@@ -56,6 +53,7 @@ def action_python(target, fpath):
             data = r.content
             break
     else:
+        print('\nNot found\n')
         return None
 
     version, ts, magic, code, is_pypy, source_size = xdis.load.load_module_from_file_object(io.BytesIO(data))
@@ -69,7 +67,7 @@ def action_python(target, fpath):
     # Decompile and save the file
     with open(out_name, 'w') as f:
         uncompyle6.semantics.pysource.deparse_code(version, code, out=f)
-        print('Decompiled to "{}"'.format(out_name))
+        print('\nDecompiled to "{}"\n'.format(out_name))
 
 
 def dispatch_action(args):
