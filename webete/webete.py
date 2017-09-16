@@ -11,23 +11,18 @@ import xdis.load
 import uncompyle6.semantics.pysource
 
 from .__init__ import __version__
-from . import settings
+from . import printer
 from . import util
 
 log = logging.getLogger()
 
 
-def start_section(name):
-    print('=' * settings.SECTION_WIDTH + ' {} '.format(name) + '=' * settings.SECTION_WIDTH)
-
-
 def action_auto(target):
-    start_section('robots.txt')
+    printer.print_header('robots.txt')
+
+    printer.print_request(target, method='get')
     r = requests.get(target + 'robots.txt')
-    if r.status_code == 200:
-        print(r.text)
-    else:
-        print(r.status_code)
+    printer.print_request_result(r.status_code, r.text if r.status_code == 200 else None)
 
 
 def action_python(target, fpath):
@@ -38,7 +33,7 @@ def action_python(target, fpath):
     PYTHON_EXTS = ['pyc', 'pyd', 'pyo']
     PYTHON_VERSIONS = ['26', '27', '35', '36', '37']
 
-    start_section('PYTHON')
+    printer.print_header('PYTHON')
 
     # Mangle file name
     fpath = util.strip_file_ext_from_list(fpath, ['py'] + PYTHON_EXTS)
@@ -54,10 +49,10 @@ def action_python(target, fpath):
         guess_url = guess_prefix + guess
 
         # Check if it exists
-        log.info('Trying "{}"...'.format(guess))
+        printer.print_request(guess_url)
         r = requests.get(guess_url)
+        printer.print_request_result(r.status_code)
         if r.status_code == 200:
-            print('FOUND: {} @ {}'.format(guess, guess_url))
             data = r.content
             break
     else:

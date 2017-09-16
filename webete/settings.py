@@ -1,3 +1,4 @@
 
 # Cosmetics
+LIST_INDENT = 3
 SECTION_WIDTH = 30
