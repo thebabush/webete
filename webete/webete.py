@@ -16,13 +16,20 @@ from . import settings
 from . import util
 
 log = logging.getLogger()
+session = requests.Session()
+
+
+def init_session():
+    session.headers.update({
+        'User-Agent': settings.HTTP_DEFAULT_USER_AGENT
+    })
 
 
 def action_auto(target):
     printer.print_header('robots.txt')
 
     printer.print_request(target, method='get')
-    r = requests.get(target + 'robots.txt')
+    r = session.get(target + 'robots.txt')
     printer.print_request_result(r.status_code, r.text if r.status_code == 200 else None)
 
 
@@ -47,7 +54,7 @@ def action_python(target, fpath):
 
         # Check if it exists
         printer.print_request(guess_url)
-        r = requests.get(guess_url)
+        r = session.get(guess_url)
         printer.print_request_result(r.status_code)
         if r.status_code == 200:
             data = r.content
@@ -93,4 +100,5 @@ def main():
 
     log.debug('Args: {}'.format(args))
 
+    init_session()
     dispatch_action(args)
