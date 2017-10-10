@@ -17,7 +17,12 @@ def print_request(url, method=None, line_end=' '):
     print('*' * settings.LIST_INDENT, '{}ing {}...'.format(method, url), end=line_end)
 
 
-def print_request_result(status, content=None):
+def print_request_result(status, content=None, max_content_lines=None):
     print(status)
     if content:
-        print(content)
+        content = content.split('\n')
+        if max_content_lines and len(content) > max_content_lines:
+            print('\n'.join(content[:max_content_lines]))
+            print('... ({} other lines not displayed) ...'.format(len(content) - max_content_lines))
+        else:
+            print('\n'.join(content))

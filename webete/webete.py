@@ -31,7 +31,7 @@ def action_auto(target):
         printer.print_header(filename)
         printer.print_request(target + filename, method='get')
         r = session.get(target + filename)
-        printer.print_request_result(r.status_code, r.text if r.status_code == 200 else None)
+        printer.print_request_result(r.status_code, r.text if r.status_code == 200 else None, settings.PREVIEW_LINES)
 
     def probe_file(filename):
         printer.print_request(target + filename, method='head')
