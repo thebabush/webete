@@ -26,11 +26,52 @@ def init_session():
 
 
 def action_auto(target):
-    printer.print_header('robots.txt')
 
+    def get_file(filename):
+        printer.print_header(filename)
+        printer.print_request(target + filename, method='get')
+        r = session.get(target + filename)
+        printer.print_request_result(r.status_code, r.text if r.status_code == 200 else None, settings.PREVIEW_LINES)
+
+    def probe_file(filename):
+        printer.print_request(target + filename, method='head')
+        r = session.head(target + filename)
+        printer.print_request_result(r.status_code)
+
+    # Step 0 - Print raw response headers
+    printer.print_header('Response Headers')
     printer.print_request(target, method='get')
-    r = session.get(target + 'robots.txt')
+    r = session.get(target)
+    print(r.status_code)
+    if r.status_code == 200:
+        for header in r.headers:
+            print("{}: {}".format(header, r.headers[header]))
+
+    # Step 1 - Webserver files
+    # We GET potentially interesting files
+    for _file in settings.AUTO_PROBE_FILES:
+        get_file(_file)
+    # We only HEAD potentially interesting folders (checking, e.g., for Apache directory listing)
+    printer.print_header('Folder probing')
+    for _file in settings.AUTO_PROBE_FOLDERS:
+        probe_file(_file)
+
+    # Step 2 - Path traversal
+    printer.print_header('Path traversal')
+    printer.print_request(target + settings.PASSWD_TRAVERSAL, method='get')
+    r = session.get(target + settings.PASSWD_TRAVERSAL)
     printer.print_request_result(r.status_code, r.text if r.status_code == 200 else None)
+
+    # Step 3 - Language probing
+    printer.print_header('Language probing')
+    # Python: try common file names, check also for potential .pyc
+    printer.print_header('Python')
+    for _file in settings.PYTHON_COMMON:
+        probe_file(_file)
+        probe_file(_file + 'c')
+    # PHP: try PHP easter egg (for PHP < 5.5)
+    printer.print_header('PHP < 5.5')
+    probe_file(settings.PHP_EASTER_EGG)
 
 
 def action_python(target, fpath):

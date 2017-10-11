@@ -10,6 +10,32 @@ HTTP_USER_AGENTS = [
 ]
 HTTP_DEFAULT_USER_AGENT = HTTP_USER_AGENTS[0]
 
+# Lists of files and extensions
+AUTO_PROBE_FILES = [
+    "robots.txt",
+    ".htaccess",
+    ".htpasswd",
+    "sitemap.xml"
+]
+AUTO_PROBE_FOLDERS = [
+    "static/",
+    "img/",
+    "imgs/",
+    "images/",
+    "css/",
+    "js/",
+    ".git/",
+    ".svn/",
+]
+PASSWD_TRAVERSAL = "../" * 10 + "etc/passwd"
+PYTHON_COMMON = [
+    'app.py',
+    'index.py',
+    'main.py',
+    'flask.py'
+]
+PHP_EASTER_EGG = "?=PHPB8B5F2A0-3C92-11d3-A3A9-4C7B08C10000"
+
 # Python options
 PYTHON_EXTS = ['pyc', 'pyd', 'pyo']
 # As of python 3.3, `sys.implementation.cache_tag` or `imp.get_tag()`.
@@ -28,3 +54,4 @@ PYTHON_CACHE_TAGS = [
 # Cosmetics
 LIST_INDENT = 3
 SECTION_WIDTH = 30
+PREVIEW_LINES = 10
